@@ -1,0 +1,28 @@
+# Package Managers
+
+composer.phar
+composer.lock
+package-lock.json
+yarn.lock
+/vendor/
+/node_modules/
+
+# Logging
+
+*.log
+/logs/
+
+# Caching
+
+/cache/
+
+# Testing
+
+/tests/input2
+!/tests/expected_report.log
+
+# Codebase
+
+/build/docs/
+/build/logs/
+/build/report/

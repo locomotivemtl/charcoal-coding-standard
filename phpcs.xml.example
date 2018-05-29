@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Charcoal Package">
+    <rule ref="./vendor/locomotivemtl/charcoal-coding-standard/Charcoal/ruleset.xml" />
+</ruleset>

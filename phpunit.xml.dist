@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/squizlabs/php_codesniffer/tests/bootstrap.php"
+         colors="true">
+    <testsuites>
+        <testsuite name="Charcoal CodeSniffer Test Suite">
+            <!--<directory>./Charcoal/Tests</directory>-->
+            <file>./vendor/squizlabs/php_codesniffer/tests/AllTests.php</file>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">./Charcoal/Sniffs</directory>
+        </whitelist>
+    </filter>
+</phpunit>

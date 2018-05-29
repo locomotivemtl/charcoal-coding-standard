@@ -1,0 +1,46 @@
+{
+    "type": "phpcodesniffer-standard",
+    "name": "locomotivemtl/charcoal-coding-standard",
+    "description": "Charcoal Coding Standard",
+    "keywords": [ "charcoal", "coding standard", "sniffer" ],
+    "homepage": "https://charcoal.locomotive.ca/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Locomotive",
+            "homepage": "https://locomotive.ca"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    },
+    "require": {
+        "php": ">=5.6.0 || >=7.0",
+        "squizlabs/php_codesniffer": "^3.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.0 || ^6.0 || ^7.0"
+    },
+    "scripts": {
+        "post-update-cmd": "@add-standard",
+        "add-standard": "phpcs --config-set installed_paths $(pwd)",
+        "test-checks": [
+            "mkdir -p build/logs/",
+            "phpcs $(find tests/input/* | sort --ignore-case) --report=summary --report-file=build/logs/phpcs.log > /dev/null || true",
+            "diff tests/expected_report.log build/logs/phpcs.log"
+        ],
+        "test-fixes": [
+            "rm -rf tests/input2/",
+            "cp -R tests/input/ tests/input2/",
+            "phpcbf tests/input2 > /dev/null || true",
+            "diff tests/input2 tests/fixed"
+        ],
+        "test-sniffs": [
+            "phpunit --coverage-text --filter Charcoal"
+        ]
+    }
+}

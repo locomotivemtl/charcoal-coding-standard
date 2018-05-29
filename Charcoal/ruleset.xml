@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Charcoal">
+    <description>Charcoal Coding Standard</description>
+
+<!-- Settings -->
+
+    <!-- Support at least PHP 5.6.30 -->
+    <config name="php_version" value="50630" />
+
+<!-- Imports -->
+
+    <!-- Import PSR-2 coding standard -->
+    <rule ref="PSR2" />
+
+<!-- Array -->
+
+    <!-- Forbid `array(...)` -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+
+    <!-- Ensures there are no spaces around array brackets -->
+    <rule ref="Squiz.Arrays.ArrayBracketSpacing" />
+
+    <!-- Force array declaration structure -->
+    <rule ref="Squiz.Arrays.ArrayDeclaration">
+        <!-- Disable alignment of braces -->
+        <exclude name="Squiz.Arrays.ArrayDeclaration.CloseBraceNotAligned" />
+        <!-- Disable arrow alignment -->
+        <exclude name="Squiz.Arrays.ArrayDeclaration.DoubleArrowNotAligned" />
+        <!-- Uses indentation of only single space -->
+        <exclude name="Squiz.Arrays.ArrayDeclaration.KeyNotAligned" />
+        <!-- Allow single value on multi-line array -->
+        <exclude name="Squiz.Arrays.ArrayDeclaration.MultiLineNotAllowed" />
+        <!-- Allow multiple values on a single line -->
+        <exclude name="Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed" />
+        <!-- Disable alignment of values with opening brace -->
+        <exclude name="Squiz.Arrays.ArrayDeclaration.ValueNotAligned" />
+    </rule>
+
+<!-- Classes -->
+
+    <!-- Forbid duplicate classes -->
+    <rule ref="Generic.Classes.DuplicateClassName" />
+
+    <!-- Checks the declaration of the class and its inheritance is correct -->
+    <rule ref="Squiz.Classes.ClassDeclaration" />
+
+    <!-- Forbid class being in a file with different name -->
+    <rule ref="Squiz.Classes.ClassFileName" />
+
+    <!-- All classes keywords should be lowercase
+    <rule ref="Squiz.Classes.LowercaseClassKeywords" /> -->
+
+    <!-- Force `self::` for self-reference, force lower-case self, forbid spaces around `::` -->
+    <rule ref="Squiz.Classes.SelfMemberReference" />
+
+<!-- Code Analysis -->
+
+    <!-- Forbid empty statements -->
+    <rule ref="Generic.CodeAnalysis.EmptyStatement" />
+
+    <!-- Simple for loops (for(;true;){}) should be while -->
+    <rule ref="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop" />
+
+    <!-- Forbid function in for(...) loops. Use a temporary variable to store the result instead -->
+    <rule ref="Generic.CodeAnalysis.ForLoopWithTestFunctionCall" />
+
+    <!-- Forbid nested loops to share the same incrementer -->
+    <rule ref="Generic.CodeAnalysis.JumbledIncrementer" />
+
+    <!-- Forbid IF statements that are only set to TRUE or FALSE -->
+    <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement" />
+
+    <!-- Forbid final methods in final classes -->
+    <rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier" />
+
+    <!-- Unused function parameter are disouraged -->
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter" />
+
+    <!-- Forbid useless empty method overrides -->
+    <rule ref="Generic.CodeAnalysis.UselessOverridingMethod" />
+
+<!-- Commenting -->
+
+    <!-- Detect "fixme" comments and warn -->
+    <rule ref="Generic.Commenting.Fixme">
+        <severity>3</severity>
+    </rule>
+    <rule ref="Generic.Commenting.Fixme.TaskFound">
+        <message>FIXME: %s</message>
+    </rule>
+
+    <!-- Detect "todo" comments and warn -->
+    <rule ref="Generic.Commenting.Todo">
+        <severity>2</severity>
+    </rule>
+    <rule ref="Generic.Commenting.Todo.TaskFound">
+        <message>TODO: %s</message>
+    </rule>
+
+    <!-- Class comment blocks -->
+    <rule ref="Squiz.Commenting.ClassComment" />
+
+    <!-- Force doc comment alignment -->
+    <rule ref="Squiz.Commenting.DocCommentAlignment">
+        <!-- Allow extra spaces after star, i.e. for indented annotations -->
+        <exclude name="Squiz.Commenting.DocCommentAlignment.SpaceAfterStar" />
+    </rule>
+
+    <!-- Ensures CATCH clause must at least have a comment -->
+    <rule ref="Squiz.Commenting.EmptyCatchComment" />
+
+    <!-- Function comment blocks -->
+    <rule ref="Squiz.Commenting.FunctionComment" />
+
+    <!-- Verifies `@throws` tags for a function that throws exceptions -->
+    <rule ref="Squiz.Commenting.FunctionCommentThrowTag" />
+
+    <!-- Checks that there is adequate spacing between comments -->
+    <rule ref="Squiz.Commenting.InlineComment">
+        <!-- Allow inline doc block comments -->
+        <exclude name="Squiz.Commenting.InlineComment.DocBlock" />
+        <!-- Ignore the ending of comments -->
+        <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
+        <!-- Ignore the casing of first letter -->
+        <exclude name="Squiz.Commenting.InlineComment.NotCapital" />
+        <!-- Ignore blank lines following an inline comment -->
+        <exclude name="Squiz.Commenting.InlineComment.SpacingAfter" />
+        <!-- Allow Perl-style comments `# Comment` -->
+        <exclude name="Squiz.Commenting.InlineComment.WrongStyle" />
+    </rule>
+
+    <!-- Ensures there are no comments after statements (or on same line) -->
+    <rule ref="Squiz.Commenting.PostStatementComment" />
+
+    <!-- Variable commenting rules -->
+    <rule ref="Squiz.Commenting.VariableComment" />
+
+<!-- Control Structures -->
+
+    <!-- Checks that control structures have the correct spacing around brackets -->
+    <rule ref="PSR2.ControlStructures.ControlStructureSpacing">
+        <!-- we want to put first expression of multiline condition on next line -->
+        <exclude name="PSR2.ControlStructures.ControlStructureSpacing.SpacingAfterOpenBrace" />
+    </rule>
+
+    <!-- Disallow else if in favor of elseif -->
+    <rule ref="PSR2.ControlStructures.ElseIfDeclaration.NotAllowed">
+        <type>error</type>
+    </rule>
+
+    <!-- Tests the spacing of shorthand IF statements -->
+    <rule ref="Squiz.ControlStructures.InlineIfDeclaration">
+        <!-- Allow inline shorthand IF statements to be declared on multiple lines -->
+        <exclude name="Squiz.ControlStructures.InlineIfDeclaration.NotSingleLine" />
+    </rule>
+
+<!-- Files -->
+
+    <!-- Ensures the whole file is PHP only, with no whitespace or inline HTML -->
+    <rule ref="Generic.Files.InlineHTML">
+        <type>warning</type>
+    </rule>
+
+<!-- Formatting -->
+
+    <!-- Force whitespace after a type cast `(array) $var`
+    <rule ref="Generic.Formatting.SpaceAfterCast" /> -->
+
+    <!-- Force whitespace after `!`
+    <rule ref="Generic.Formatting.SpaceAfterNot" /> -->
+
+    <!-- If an assignment goes over two lines, ensure the equal sign is indented -->
+    <rule ref="PEAR.Formatting.MultiLineAssignment" />
+
+    <!-- Ensure no whitespace after a type cast `(array)$var` -->
+    <rule ref="Generic.Formatting.NoSpaceAfterCast" />
+
+    <!-- Tests that all arithmetic operations are bracketed. -->
+    <rule ref="Squiz.Formatting.OperatorBracket" />
+
+<!-- Functions -->
+
+    <!-- Ensures that variables are not passed by reference when calling a function -->
+    <rule ref="Generic.Functions.CallTimePassByReference" />
+
+    <!-- Checks that duplicate arguments are not used in function declarations -->
+    <rule ref="Squiz.Functions.FunctionDuplicateArgument" />
+
+    <!-- Forbid global functions -->
+    <rule ref="Squiz.Functions.GlobalFunction" />
+
+<!-- Namespaces -->
+
+<!-- Naming Conventions -->
+
+    <!-- Forbid PHP 4 constructors -->
+    <rule ref="Generic.NamingConventions.ConstructorName" />
+
+<!-- Objects -->
+
+    <!-- Ensures objects are assigned to a variable when instantiated. -->
+    <rule ref="Squiz.Objects.ObjectInstantiation">
+        <exclude name="Squiz.Objects.ObjectInstantiation.NotAssigned" />
+    </rule>
+
+<!-- Operators -->
+
+    <!-- Force === operator instead of implicit true `if (x)` or false `if (!x)`
+    <rule ref="Squiz.Operators.ComparisonOperatorUsage" /> -->
+
+    <!-- Make sure all instances of ++ operators makes sense -->
+    <rule ref="Squiz.Operators.IncrementDecrementUsage" />
+
+    <!-- Forbid `AND` and `OR`, require `&&` and `||` -->
+    <rule ref="Squiz.Operators.ValidLogicalOperators" />
+
+<!-- PHP -->
+
+    <!-- Forbid backtick operator -->
+    <rule ref="Generic.PHP.BacktickOperator" />
+
+    <!-- Forbid any content before opening tag -->
+    <rule ref="Generic.PHP.CharacterBeforePHPOpeningTag" />
+
+    <!-- Forbid deprecated functions -->
+    <rule ref="Generic.PHP.DeprecatedFunctions" />
+
+     <!-- Forbid all PHP short tags -->
+    <rule ref="Generic.PHP.DisallowShortOpenTag" />
+
+    <!-- Forbid alias functions, i.e. `sizeof()`, `delete()` -->
+    <rule ref="Generic.PHP.ForbiddenFunctions">
+        <properties>
+            <property name="forbiddenFunctions" type="array">
+                <element key="chop" value="rtrim" />
+                <element key="delete" value="unset" />
+                <element key="doubleval" value="floatval" />
+                <element key="fputs" value="fwrite" />
+                <element key="ini_alter" value="ini_set" />
+                <element key="is_double" value="is_float" />
+                <element key="is_integer" value="is_int" />
+                <element key="is_long" value="is_int" />
+                <element key="is_null" value="null" />
+                <element key="is_real" value="is_float" />
+                <element key="is_writeable" value="is_writable" />
+                <element key="join" value="implode" />
+                <element key="pos" value="current" />
+                <element key="print" value="echo" />
+                <element key="settype" value="null" />
+                <element key="show_source" value="highlight_file" />
+                <element key="sizeof" value="count" />
+                <element key="strchr" value="strstr" />
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Discourage code prefixed with an @ (error suppression) -->
+    <rule ref="Generic.PHP.NoSilencedErrors" />
+
+    <!-- Forbid `php_sapi_name()` function -->
+    <rule ref="Generic.PHP.SAPIUsage" />
+
+    <!-- Warn of commented out code -->
+    <rule ref="Squiz.PHP.CommentedOutCode" />
+
+    <!-- Ensures there is only one assignment on a line -->
+    <rule ref="Squiz.PHP.DisallowMultipleAssignments" />
+
+    <!-- Forbid the use of size-based functions in loop conditions -->
+    <rule ref="Squiz.PHP.DisallowSizeFunctionsInLoops" />
+
+    <!-- Discouraged functions -->
+    <rule ref="Squiz.PHP.DiscouragedFunctions">
+        <properties>
+            <property name="forbiddenFunctions" type="array">
+                <element key="compact" value="null" />
+                <element key="error_log" value="null" />
+                <element key="extract" value="null" />
+                <element key="print_r" value="null" />
+                <element key="var_dump" value="null" />
+                <element key="var_export" value="null" />
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Forbid `eval()` function -->
+    <rule ref="Squiz.PHP.Eval" />
+
+    <!-- Forbid the use of the `global` keyword -->
+    <rule ref="Squiz.PHP.GlobalKeyword" />
+
+    <!-- Forbid the use of heredocs and nowdocs -->
+    <rule ref="Squiz.PHP.Heredoc" />
+
+    <!-- Ensures that functions within functions are never used -->
+    <rule ref="Squiz.PHP.InnerFunctions" />
+
+    <!-- Ensures all calls to native PHP functions are lowercase -->
+    <rule ref="Squiz.PHP.LowercasePHPFunctions" />
+
+    <!-- Warns about code that can never been executed -->
+    <rule ref="Squiz.PHP.NonExecutableCode" />
+
+<!-- Scope -->
+
+    <!-- Verifies that class members have scope modifiers. -->
+    <rule ref="Squiz.Scope.MemberVarScope" />
+
+    <!-- Forbid `$this` inside static function -->
+    <rule ref="Squiz.Scope.StaticThisUsage" />
+
+<!-- Strings -->
+
+    <!-- Forbid useless inline string concatenation -->
+    <rule ref="Generic.Strings.UnnecessaryStringConcat">
+        <!-- But multiline is useful for readability -->
+        <properties>
+            <property name="allowMultiline" type="boolean" value="true" />
+        </properties>
+    </rule>
+
+    <!-- Force whitespace before and after concatenation -->
+    <rule ref="Squiz.Strings.ConcatenationSpacing">
+        <properties>
+            <property name="ignoreNewlines" type="boolean" value="true" />
+        </properties>
+    </rule>
+
+    <!-- Forbid strings in `"` unless necessary -->
+    <rule ref="Squiz.Strings.DoubleQuoteUsage" />
+    <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
+        <message>Variable "%s" not allowed in double quoted string; use sprintf() or concatenation instead</message>
+    </rule>
+    <!-- Forbid braces around string in `echo` -->
+    <rule ref="Squiz.Strings.EchoedStrings" />
+
+<!-- Type Hints -->
+
+<!-- White Space -->
+
+    <!-- Require space after language constructs -->
+    <rule ref="Generic.WhiteSpace.LanguageConstructSpacing" />
+
+    <!-- Checks that object operators are indented correctly -->
+    <rule ref="PEAR.WhiteSpace.ObjectOperatorIndent">
+        <!-- Ignore incorrectly aligned object operators -->
+        <exclude name="PEAR.WhiteSpace.ObjectOperatorIndent.Incorrect" />
+    </rule>
+
+    <!-- Forbid spaces in type casts -->
+    <rule ref="Squiz.WhiteSpace.CastSpacing" />
+
+    <!-- Forbid blank line after function opening brace -->
+    <rule ref="Squiz.WhiteSpace.FunctionOpeningBraceSpace" />
+
+    <!-- Require space around logical operators -->
+    <rule ref="Squiz.WhiteSpace.LogicalOperatorSpacing" />
+
+    <!-- Forbid spaces around `->` operator -->
+    <rule ref="Squiz.WhiteSpace.ObjectOperatorSpacing">
+        <properties>
+            <property name="ignoreNewlines" type="boolean" value="true" />
+        </properties>
+    </rule>
+
+    <!-- Forbid spaces before semicolon `;` -->
+    <rule ref="Squiz.WhiteSpace.SemicolonSpacing" />
+
+</ruleset>

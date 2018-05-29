@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset
+    name="PHPCS Coding Standards for locomotivemtl/charcoal-coding-standards"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd"
+>
+    <description>Check the code of the sniffs in locomotivemtl/charcoal-coding-standards.</description>
+
+    <arg name="basepath" value="." />
+    <arg name="extensions" value="php" />
+    <arg name="colors" />
+    <arg value="p" />
+
+    <rule ref="Charcoal" />
+</ruleset>

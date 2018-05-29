@@ -1,0 +1,16 @@
+
+PHP CODE SNIFFER REPORT SUMMARY
+----------------------------------------------------------------------
+FILE                                                  ERRORS  WARNINGS
+----------------------------------------------------------------------
+tests/input/braces.php                                10      2
+tests/input/casing.php                                4       3
+tests/input/indentation.php                           16      1
+tests/input/spaces.php                                21      5
+----------------------------------------------------------------------
+A TOTAL OF 51 ERRORS AND 11 WARNINGS WERE FOUND IN 4 FILES
+----------------------------------------------------------------------
+PHPCBF CAN FIX 34 OF THESE SNIFF VIOLATIONS AUTOMATICALLY
+----------------------------------------------------------------------
+
+
