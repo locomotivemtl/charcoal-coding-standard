@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+#
+# TITLE:        PHP Syntax Check (Lint)
+# DESCRIPTION:  Recursively perform syntax checks on PHP files
+#               with several processes at once.
+# AUTHOR:       Chauncey McAskill <chauncey@mcaskill.ca>
+#               Locomotive Inc. <info@locomotive.ca>
+# DATE:         2018-06-08
+# VERSION:      0.1.0 (100)
+# LICENSE:      The MIT License (MIT)
+# USAGE:        phplint [options] [<path>]...
+# REPOSITORY:   https://github.com/locomotivemtl/charcoal-coding-standard
+# ################################################
+
+APP_NAME=`basename $0`
+APP_TITLE='PHP Syntax Check'
+APP_VERSION='0.1.0 (100)'
+
+
+
+# Utils
+# ------------------------------------------------
+
+#
+# Find files, check syntax, output results
+#
+# Arguments:
+#   $@ (required) - One or more paths to files or directories with PHP code.
+#
+function main() {
+    find ${@} \( -type f -name '*.php' \) -print0 2>/dev/null | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected'; test $? -eq 1
+}
+
+#
+# Print Usage
+#
+function show_usage() {
+    echo -n "$(show_header)
+
+Usage:
+  ${APP_NAME} [options] [<path>]...
+
+Arguments:
+  path            One or more paths to files or directories to search for PHP files.
+
+Options:
+  -h, --help      Display this help message and exit.
+  -V, --version   Display version information and exit.
+"
+}
+
+#
+# Print title, version, and author
+#
+function show_header() {
+    echo "${APP_TITLE} v${APP_VERSION} by Locomotive Inc."
+}
+
+
+
+# Help
+# ------------------------------------------------
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    show_usage >&2;
+    exit 0
+fi
+
+
+
+# Version
+# ------------------------------------------------
+
+if [ "$1" == "-V" ] || [ "$1" == "--version" ]; then
+    show_header >&2;
+    exit 0
+fi
+
+
+
+# Lint
+# ------------------------------------------------
+
+main "$@"

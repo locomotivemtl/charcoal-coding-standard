@@ -90,6 +90,8 @@ You can also install the Charcoal Coding Standard system-wide:
 
 ## Usage
 
+### Sniffing
+
 Depending on how you installed the Charcoal Coding Standard, you can do the following:
 
 Detect violations of this standard with one of:
@@ -118,6 +120,48 @@ For further usage options, see the [CLI documentation](https://github.com/squizl
 
 
 
+### Linting
+
+The Charcoal Coding Standard provides a simple but convenient bash script wrapper around `php -l` to recursively perform syntax checks on PHP files with several processes at once.
+
+```
+Usage:
+  phplint [options] [<path>]...
+
+Arguments:
+  path            One or more paths to files or directories to search for PHP files.
+                  Defaults to ./src and ./tests.
+
+Options:
+  -h, --help      Display this help message and exit.
+  -V, --version   Display version information and exit.
+```
+
+Example:
+
+```console
+$ phplint src/Http/Controllers/ src/Providers/RouteServiceProvider.php
+```
+
+> Note: The script is not part of the `composer.json`; it is not added to the given project when the package is installed. The script must be called from the vendor package or you must manually symlink it into your `bin-dir`.
+> 
+> 1.  You can run the script from your project:
+> 
+>     ```console
+>     $ ./vendor/locomotivemtl/charcoal-coding-standard/bin/phplint ./src ./tests
+>     ```
+> 
+> 2.  You can also symlink the script into your project's `bin-dir`:
+> 
+>     ```console
+>     $ cd $(composer config bin-dir)
+>     $ ln -s ../locomotivemtl/charcoal-coding-standard/bin/phplint ./phplint
+>     ```
+> 
+> Check out [overtrue/phplint][overtrue/phplint], a more advanced and configurable tool for linting PHP files.
+
+
+
 ## Credits
 
 -   Chauncey McAskill <chauncey@locomotive.ca>
@@ -133,6 +177,8 @@ Charcoal is licensed under the MIT license. See [LICENSE](/LICENSE) for details.
 
 [charcoal-coding-standard]:  https://packagist.org/packages/locomotivemtl/charcoal-coding-standard
 [charcoal-app]:              https://packagist.org/packages/locomotivemtl/charcoal-app
+
+[overtrue/phplint]:          https://packagist.org/packages/overtrue/phplint
 
 [dev-travis]:         https://travis-ci.org/locomotivemtl/charcoal-coding-standard
 
