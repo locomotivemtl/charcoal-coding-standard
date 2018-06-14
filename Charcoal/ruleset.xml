@@ -81,24 +81,11 @@
 
 <!-- Commenting -->
 
-    <!-- Detect "fixme" comments and warn -->
-    <rule ref="Generic.Commenting.Fixme">
-        <severity>3</severity>
-    </rule>
-    <rule ref="Generic.Commenting.Fixme.TaskFound">
-        <message>FIXME: %s</message>
-    </rule>
-
-    <!-- Detect "todo" comments and warn -->
-    <rule ref="Generic.Commenting.Todo">
-        <severity>2</severity>
-    </rule>
-    <rule ref="Generic.Commenting.Todo.TaskFound">
-        <message>TODO: %s</message>
-    </rule>
-
     <!-- Class comment blocks -->
-    <rule ref="Squiz.Commenting.ClassComment" />
+    <rule ref="Squiz.Commenting.ClassComment">
+        <!-- Checked by Charcoal.Commenting.ClassComment.TagNotAllowed -->
+        <exclude name="Squiz.Commenting.ClassComment.TagNotAllowed" />
+    </rule>
 
     <!-- Force doc comment alignment -->
     <rule ref="Squiz.Commenting.DocCommentAlignment">
