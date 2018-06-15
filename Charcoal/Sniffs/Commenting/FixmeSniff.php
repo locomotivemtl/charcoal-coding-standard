@@ -10,12 +10,26 @@ use Charcoal\Sniffs\Commenting\AbstractTaskSniff;
 class FixmeSniff extends AbstractTaskSniff
 {
     /**
-     * A list of task types that should show errors.
+     * A list of task types that should show errors with their severity level.
      *
-     * @var array<int,string>
+     * A value of 0 will be converted into the default severity level.
+     *
+     * @var array<string, int>
      */
-    public $annotationNames = [
-        'FIXME',
+    public $taskNames = [
+        'FIXME' => 0,
+    ];
+
+    /**
+     * A list of tag names to look up with their default task name.
+     *
+     * The value is NULL if no default task should be assigned. IE,
+     * the tag will be analysed but ignored if no task is assigned.
+     *
+     * @var array<string, string|null>
+     */
+    public $tagNames = [
+        '@todo' => null,
     ];
 
     /**
