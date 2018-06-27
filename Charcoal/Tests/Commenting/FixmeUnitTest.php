@@ -30,6 +30,7 @@ class FixmeUnitTest extends AbstractSniffUnitTest
             16 => 1,
             18 => 1,
             21 => 1,
+            25 => 1,
         ];
     } // end getErrorList()
 

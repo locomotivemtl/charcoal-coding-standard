@@ -21,3 +21,5 @@ alert('test');
 //FIXME.
 //éfixme
 //fixmeé
+
+/** @todo:fixme This is not how we should do this. */

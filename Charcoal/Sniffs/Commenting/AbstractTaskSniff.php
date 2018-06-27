@@ -2,7 +2,6 @@
 
 namespace Charcoal\CodeSniffer\Sniffs\Commenting;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Util\Tokens;
 
@@ -14,12 +13,8 @@ use PHP_CodeSniffer\Util\Tokens;
  * @todo RFE - Add support for task labels.
  * @todo RFE - Add support for task aliases.
  */
-abstract class AbstractTaskSniff implements Sniff
+abstract class AbstractTaskSniff implements TaskSniff
 {
-    const CODE_COMMENT_FOUND = 'CommentFound';
-    const CODE_TAG_FOUND     = 'TagFound';
-    const CODE_TASK_FOUND    = 'TaskFound';
-
     /**
      * A list of tokenizers this sniff supports.
      *
@@ -137,6 +132,16 @@ abstract class AbstractTaskSniff implements Sniff
     protected $regexCommentMetadataPattern;
 
     /**
+     * A cache of all registered tasks across all sub-classes, to avoid conflicts.
+     *
+     * The value is the class that registered the annotation.
+     *
+     * @var array<string, string>
+     * @see self::registerAnnotations()
+     */
+    protected static $registeredTaskNames = [];
+
+    /**
      * A cache of processed tasks and comments, to avoid duplicate reports.
      *
      * The value is the main token (a comment tag) and the key is the related token.
@@ -150,7 +155,7 @@ abstract class AbstractTaskSniff implements Sniff
      *
      * @return array
      */
-    final public function register()
+    public function register()
     {
         $this->registerAnnotations();
 
@@ -236,11 +241,19 @@ abstract class AbstractTaskSniff implements Sniff
     {
         $tokens = $phpcsFile->getTokens();
 
-        $tagName = $tokens[$stackPtr]['content'];
+        list($tagName, $taskName) = $this->parseCommentTag($tokens[$stackPtr]['content']);
 
-        // Check if its an accepted task tag
+        // Check if its an accepted comment tag (e.g., `@todo`).
         if ($this->isCommentTag($tagName) === false) {
             return;
+        }
+
+        // Check if its an accepted comment subtag (e.g., `@todo:hack`).
+        if ($taskName !== null && isset(static::$registeredTaskNames[$taskName]) === true) {
+            $className = static::$registeredTaskNames[$taskName];
+            if (is_a($this, $className) === false) {
+                return;
+            }
         }
 
         $task = $this->parseTaskFromDocComment($phpcsFile, $stackPtr);
@@ -337,37 +350,70 @@ abstract class AbstractTaskSniff implements Sniff
             } // end if
         } // end if
 
-        // Enhance this task structure by scanning the comment for any annotations.
-        $task = $this->parseTaskFromComment($comment, false);
+        // If a valid subtag is found, use that as the task name.
+        list($tagName, $taskName) = $this->parseCommentTag($tokens[$tag]['content']);
 
-        // If the comment is just a description, use the comment tag to resolve the task name.
-        if ($task === false) {
-            // If the comment tag does not have a fallback task name, ignore the tag.
-            $tagName = $tokens[$tag]['content'];
-            if (isset($this->includedTagNames[$tagName])) {
-                $taskName = $this->includedTagNames[$tagName];
-            } else {
-                return false;
-            }
-
-            // Generate a task from the simple comment tag.
+        if ($this->isCodeTag($taskName) === true) {
             $task = [
                 'name' => $taskName,
-                'desc' => $this->parseTaskData($comment),
+                'body' => $this->parseTaskBody($comment),
             ];
         } else {
-            $taskName = strtoupper(trim($task['name']));
-            // If the extracted task name isn't accepted, ignore the tag.
-            if (isset($this->includedTaskNames[$taskName]) === false) {
-                return false;
-            }
-        } // end if
+            $taskName = null;
+
+            // If a valid task name is found, use that.
+            $task = $this->parseTaskFromComment($comment, false);
+
+            // If the comment is just a description, use the comment tag to resolve the task name.
+            if ($task === false) {
+                // If the comment tag does not have a fallback task name, ignore the tag.
+                if (isset($this->includedTagNames[$tagName]) === false) {
+                    return false;
+                }
+
+                $taskName = $this->includedTagNames[$tagName];
+
+                $task = [
+                    'name' => $taskName,
+                    'body' => $this->parseTaskBody($comment),
+                ];
+            } else {
+                $taskName = $task['name'];
+
+                // If the extracted task name isn't accepted, ignore the tag.
+                if ($this->isCodeTag($taskName) === false) {
+                    return false;
+                }
+            } // end if
+        }
 
         $task['comment_tokens'] = $commentTokens;
         $task['comment_lines']  = $commentLines;
 
         return $task;
     } // end parseTaskFromDocComment()
+
+    /**
+     * Parse the name of the task annotation from the comment tag.
+     *
+     * @param  string $tagName The comment tag.
+     *
+     * @return string[] The comment tag parts: `[ <tag>, <task> ]`.
+     */
+    protected function parseCommentTag($tagName)
+    {
+        if (substr($tagName, 0, 1) !== '@') {
+            return [ null, null ];
+        }
+
+        list($tagName, $taskName) = array_pad(explode(':', $tagName, 2), 2, null);
+
+        if ($taskName !== null) {
+            $taskName = strtoupper($taskName);
+        }
+
+        return [ $tagName, $taskName ];
+    } // end parseCommentTag()
 
     /**
      * Parse this comment for any task and return the task as a dataset.
@@ -395,7 +441,7 @@ abstract class AbstractTaskSniff implements Sniff
 
         $task = [
             'name' => $this->parseTaskName($matches['name']),
-            'desc' => $this->parseTaskData($matches['data']),
+            'body' => $this->parseTaskBody($matches['body']),
         ];
 
         return $task;
@@ -410,45 +456,45 @@ abstract class AbstractTaskSniff implements Sniff
      */
     protected function parseTaskName($name)
     {
-        $name = strtoupper($name);
+        $name = strtoupper(trim($name));
         return $name;
     } // end parseTaskName()
 
     /**
      * Parse the descriptor of the task annotation.
      *
-     * @param  string $data The task description (everything after the task name).
+     * @param  string $body The task description (everything after the task name).
      *
      * @return string|null The sanitized task description.
      */
-    protected function parseTaskData($data)
+    protected function parseTaskBody($body)
     {
         // Clear whitespace and some common characters not required at
         // the end of a task message to make the notice more informative.
-        $data = trim($data);
-        $data = $this->stripTaskMetadata($data);
-        $data = trim($data, '-:[](). ');
+        $body = trim($body);
+        $body = $this->stripTaskMetadata($body);
+        $body = trim($body, '-:[](). ');
 
-        if ($data === '') {
+        if ($body === '') {
             return null;
         }
 
-        return $data;
-    } // end parseTaskData()
+        return $body;
+    } // end parseTaskBody()
 
     /**
      * Strip the extraneous characters and metadata from the task annotation.
      *
-     * @param  string $data The task description.
+     * @param  string $body The task description.
      *
      * @return string The sanitized task description.
      */
-    protected function stripTaskMetadata($data)
+    protected function stripTaskMetadata($body)
     {
         // Strip metadata for the Google's C++ Style Guide and Python's PEP-350.
         $pattern = $this->regexCommentMetadataPattern;
 
-        return preg_replace($pattern, '$1', $data);
+        return preg_replace($pattern, '$1', $body);
     } // end stripTaskMetadata()
 
     /**
@@ -488,10 +534,10 @@ abstract class AbstractTaskSniff implements Sniff
     {
         $data = [
             $task['name'],
-            $task['desc'],
+            $task['body'],
         ];
 
-        if ($task['desc'] === null) {
+        if ($task['body'] === null) {
             if ($task['type'] === T_DOC_COMMENT_TAG) {
                 $code  = self::CODE_TAG_FOUND;
                 $error = 'Tag refers to a %s task';
@@ -524,36 +570,50 @@ abstract class AbstractTaskSniff implements Sniff
         $pregTasks = [];
         foreach ($this->taskNames as $taskName => $severity) {
             $taskName = strtoupper(trim($taskName));
-            if (empty($taskName)) {
-                $taskName = null;
+
+            if (empty($taskName) === true) {
+                /** @todo Throw exception if task name is invalid. */
+                continue;
             }
 
-            $severity = is_numeric($severity) ? (int)$severity : 0;
+            if (isset(static::$registeredTaskNames[$taskName]) === true) {
+                /** @todo Throw exception if task name is already registered. */
+                continue;
+            }
 
+            static::$registeredTaskNames[$taskName] = static::class;
+
+            $severity = is_numeric($severity) ? (int)$severity : 0;
             $this->includedTaskNames[$taskName] = $severity;
 
             $pregTasks[] = preg_quote($taskName);
         }
 
-        if (empty($this->includedTaskNames) === false) {
-            $search  = implode('|', $pregTasks);
+        if (empty($pregTasks) === false) {
+            $pcreTasks = implode('|', $pregTasks);
+
+            $st = '(?:\A|[^\p{L}]+)'; // Beginning
+            $bt = '(?<body>.*)';      // Body Text
+            $bp = '(?<body>)';        // Body Placeholder
+            $pl = '[^\p{L}]+';        // Non-Letter
+            $se = '\s*(?:-+|:)\s*';   // Segmentation
 
             // Example: <em>TODO</em> - We need to clean this code up.
-            $pattern = '/(?:\A|[^\p{L}]+)(?<name>'.$search.')(?:[^\p{L}]+|\Z)/ui';
+            $pattern = '/'.$st.'(?<name>'.$pcreTasks.')(?:'.$pl.'|\Z)/ui';
             $this->regexCodeTagPattern = $pattern;
 
             // Example: <em>TODO - We need to clean this code up.</em>
-            $pattern = '/(?:\A|[^\p{L}]+)(?<name>'.$search.')(?<data>[^\p{L}]+.*|\Z)/ui';
+            $pattern = '/'.$st.'(?<name>'.$pcreTasks.')(?|'.$se.$bt.'|'.$bp.$pl.'|'.$bp.'\Z)/ui';
             $this->regexCommentStringPattern = $pattern;
 
             // Example: <em>TODO - We need to clean this code up.</em>
-            $pattern = '/(?:\A|[^\p{L}]+)(?<name>[A-Z-]+)(?<data>\s*[-:]\s*.*|\Z)/ui';
+            $pattern = '/^(?<name>[A-Z-]+)(?|'.$se.$bt.'|'.$bp.$pl.')$/ui';
             $this->regexAnyCommentStringPattern = $pattern;
 
-            $search  = '[\[\{\(\<](.*)[\]\}\)\>]';
+            $metadata = '[\[\{\(\<](.*)[\]\}\)\>]';
 
             // Example: <em>(Zeke)</em> We need to clean this code up. <em><#1234 2018-01-01 00:00:00></em>
-            $pattern = '/^'.$search.'$|^'.$search.'[^\p{L}]*|[^\p{L}]*'.$search.'$/';
+            $pattern = '/^'.$metadata.'$|^'.$metadata.'[^\p{L}]*|[^\p{L}]*'.$metadata.'$/';
             $this->regexCommentMetadataPattern = $pattern;
         }
 
@@ -576,9 +636,15 @@ abstract class AbstractTaskSniff implements Sniff
         }
 
         if (empty($pregTags) === false) {
-            $search  = implode('|', $pregTags);
-            // Example: <em>@todo</em> We need to clean this code up.
-            $pattern = '/^@(?<name>'.$search.')$/i';
+            $pcreTags = implode('|', $pregTags);
+            if (empty($pregTasks) === false) {
+                // Example: <em>@todo:yagni</em> We need to clean this code up.
+                $pattern = '/^@(?|(?<name>'.$pcreTags.')|'.$pcreTags.':(?<name>'.$pcreTasks.'))$/i';
+            } else {
+                // Example: <em>@todo</em> We need to clean this code up.
+                $pattern = '/^@(?<name>'.$pcreTags.')$/i';
+            }
+
             $this->regexDocTagPattern = $pattern;
         }
     } // end registerAnnotations()
