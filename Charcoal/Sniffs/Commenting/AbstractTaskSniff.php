@@ -1,6 +1,6 @@
 <?php
 
-namespace Charcoal\Sniffs\Commenting;
+namespace Charcoal\CodeSniffer\Sniffs\Commenting;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;

@@ -1,8 +1,6 @@
 <?php
 
-namespace Charcoal\Sniffs\Commenting;
-
-use Charcoal\Sniffs\Commenting\AbstractTaskSniff;
+namespace Charcoal\CodeSniffer\Sniffs\Commenting;
 
 /**
  * Warns about TODO / @todo comments.

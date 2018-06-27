@@ -1,6 +1,6 @@
 <?php
 
-namespace Charcoal\Tests\Commenting;
+namespace Charcoal\CodeSniffer\Tests\Commenting;
 
 use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest;
 
