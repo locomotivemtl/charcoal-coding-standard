@@ -4,13 +4,17 @@
 
 <!-- Settings -->
 
-    <!-- Support at least PHP 5.6.30 -->
-    <config name="php_version" value="50630" />
+    <!-- Support at least PHP 7.0.1 -->
+    <config name="php_version" value="70010" />
 
 <!-- Imports -->
 
-    <!-- Import PSR-2 coding standard -->
-    <rule ref="PSR2" />
+    <!-- Import PSR-12 coding standard -->
+    <rule ref="PSR12">
+        <!-- Disable concatenation whitespace -->
+        <exclude name="PSR12.Operators.OperatorSpacing.NoSpaceBefore" />
+        <exclude name="PSR12.Operators.OperatorSpacing.NoSpaceAfter" />  
+    </rule>
 
 <!-- Array -->
 
@@ -305,7 +309,7 @@
             <property name="allowMultiline" type="boolean" value="true" />
         </properties>
     </rule>
-
+    
     <!-- Force whitespace before and after concatenation -->
     <rule ref="Squiz.Strings.ConcatenationSpacing">
         <properties>
